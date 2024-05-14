@@ -24,7 +24,7 @@ public class TagService {
     }
 
     public Tag findById(long id) {
-        return tagRepository.findById(id).orElse(new Tag());
+        return tagRepository.findById(id).orElse(null);
     }
 
     @Transactional
@@ -42,9 +42,13 @@ public class TagService {
     }
 
     @Transactional
-    public void deleteById(long id) {
+    public String deleteById(long id) {
         Tag tag = tagRepository.findById(id).orElse(new Tag());
+        if (tag.getQuestions() != null) {
+            return "This tag is in use. No delete can be provided.";
+        }
         tagRepository.deleteById(id);
+        return "Success";
     }
 
 }

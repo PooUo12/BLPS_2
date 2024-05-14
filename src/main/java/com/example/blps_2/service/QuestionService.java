@@ -6,6 +6,8 @@ import com.example.blps_2.model.Question;
 import com.example.blps_2.model.Tag;
 import com.example.blps_2.repository.QuestionRepository;
 import com.example.blps_2.repository.TagRepository;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,8 +29,19 @@ public class QuestionService {
         this.tagRepository = tagRepository;
     }
 
-    public List<Question> allQuestions() {
-        return questionRepository.findAll();
+    public List<NewQuestionDTO> allQuestions() {
+        List<Question> questions = questionRepository.findAll();
+        List<NewQuestionDTO> answer = new ArrayList<>();
+        for(Question question : questions) {
+            List<Long> tags = new ArrayList<>();
+            for(Tag tag : question.getTags()) {
+                tags.add(tag.getId());
+            }
+            answer.add(
+                    new NewQuestionDTO(question.getQuestionTitle(), question.getQuestionDescription(), tags)
+            );
+        }
+        return answer;
     }
 
     public Question findById(long id) {
@@ -64,6 +77,10 @@ public class QuestionService {
 
     @Transactional
     public Map<String, String> updateQuestion(long id, UpdateQuestionDTO updatequestion) {
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        if(!auth.getName().equals(questionRepository.findById(id).orElse(new Question()).getUsername())){
+            return Map.of("message", "failure - you are not author of this question");
+        }
         Question questionStored = questionRepository.findById(id).orElse(null);
         if (questionStored == null) {
             return Map.of("message", "failure - no such question");
@@ -84,6 +101,10 @@ public class QuestionService {
 
     @Transactional
     public Map<String, String> updateQuestionRating(long id, boolean flag){
+        Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
+        if(auth.getName().equals(questionRepository.findById(id).orElse(new Question()).getUsername())){
+            return Map.of("message", "failure - you cant vote on your own question");
+        }
         Question questionStored = questionRepository.findById(id).orElse(null);
         if (questionStored == null) {
             return Map.of("message", "failure - no such question");

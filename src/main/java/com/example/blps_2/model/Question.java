@@ -38,6 +38,9 @@ public class Question {
     @Column(name = "rating")
     private int rating;
 
+    @Column(name = "username")
+    private String username;
+
     @ManyToMany
     List<Tag> tags;
 

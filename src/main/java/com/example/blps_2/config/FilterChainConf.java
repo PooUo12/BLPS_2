@@ -47,8 +47,6 @@ public class FilterChainConf extends OncePerRequestFilter {
         }
 
         var jwt = authHeader.substring(JWT_START.length()+1);
-        System.out.println(jwt);
-        System.out.println(jwt.isBlank());
 
         if (jwt.isBlank()) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
@@ -58,7 +56,6 @@ public class FilterChainConf extends OncePerRequestFilter {
         try {
             var data = jwtUtil.validateTokenAndRetrieveClaim(jwt);
             var username = data.get("username");
-            System.out.println(data);
 
             var userDetails = userDetailsService.loadUserByUsername(username);
             var authenticationToken = new UsernamePasswordAuthenticationToken(userDetails, userDetails.getPassword(), userDetails.getAuthorities());
@@ -67,7 +64,6 @@ public class FilterChainConf extends OncePerRequestFilter {
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
         } catch (JWTVerificationException | UsernameNotFoundException e) {
             response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Invalid JWT token");
-            System.out.println(jwt);
             return;
         }
 
