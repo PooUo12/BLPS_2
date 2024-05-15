@@ -5,6 +5,7 @@ import com.example.blps_2.model.Question;
 import com.example.blps_2.model.Review;
 import com.example.blps_2.repository.QuestionRepository;
 import com.example.blps_2.repository.ReviewRepository;
+import com.example.blps_2.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,12 +16,14 @@ import java.util.Map;
 public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final QuestionRepository questionRepository;
+    private final UserRepository userRepository;
 
 
     @Autowired
-    public ReviewService(ReviewRepository reviewRepository, QuestionRepository questionRepository) {
+    public ReviewService(ReviewRepository reviewRepository, QuestionRepository questionRepository, UserRepository userRepository) {
         this.reviewRepository = reviewRepository;
         this.questionRepository = questionRepository;
+        this.userRepository = userRepository;
     }
 
     public Map<String, String> saveReview(long questionId, Review review) {

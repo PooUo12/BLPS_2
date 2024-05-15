@@ -4,6 +4,8 @@ import com.example.blps_2.model.Role;
 import com.example.blps_2.model.User;
 import com.example.blps_2.repository.UserRepository;
 import com.example.blps_2.security.JWTProvider;
+import com.example.blps_2.userXML.Users;
+import com.example.blps_2.userXML.XMLWorker;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PreDestroy;
 import java.util.*;
 
 @Service
@@ -27,6 +30,15 @@ public class UserService implements UserDetailsService {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.passwordEncoder = passwordEncoder;
+        XMLWorker xmlWorker = new XMLWorker();
+        Users users = xmlWorker.xmlRead();
+        if (users == null){
+            return;
+        }
+        for (com.example.blps_2.userXML.User user: users.getUserList()){
+            saveUser(new User(user.getId(), user.getUsername(), user.getPass(), Collections.singleton(new Role(1L, "ROLE_USER")), user.getRatings()));
+        }
+
     }
 
 
@@ -101,6 +113,15 @@ public class UserService implements UserDetailsService {
         }
 
         return user;
+    }
+    @PreDestroy
+    public void destroy(){
+        List<com.example.blps_2.userXML.User> users = new ArrayList<>();
+        for(User user: allUsers()){
+            users.add(new com.example.blps_2.userXML.User(user.getId(), user.getUsername(), user.getPassword(), user.getRatings()));
+            XMLWorker xmlWorker = new XMLWorker();
+            xmlWorker.xmlWrite(new Users(users));
+        }
     }
 }
 

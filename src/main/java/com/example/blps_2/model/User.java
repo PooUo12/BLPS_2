@@ -34,6 +34,9 @@ public class User implements UserDetails {
     @ManyToMany(fetch = FetchType.EAGER)
     private Set<Role> roles;
 
+    @Column(name = "ratings", nullable = false)
+    private int ratings;
+
     public User() {
     }
 

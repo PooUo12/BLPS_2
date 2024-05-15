@@ -6,6 +6,7 @@ import com.example.blps_2.model.Question;
 import com.example.blps_2.model.Tag;
 import com.example.blps_2.repository.QuestionRepository;
 import com.example.blps_2.repository.TagRepository;
+import com.example.blps_2.repository.UserRepository;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,11 +23,13 @@ import java.util.Map;
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final TagRepository tagRepository;
+    private final UserRepository userRepository;
 
     @Autowired
-    public QuestionService(QuestionRepository questionRepository, TagRepository tagRepository) {
+    public QuestionService(QuestionRepository questionRepository, TagRepository tagRepository, UserRepository userRepository) {
         this.questionRepository = questionRepository;
         this.tagRepository = tagRepository;
+        this.userRepository = userRepository;
     }
 
     public List<NewQuestionDTO> allQuestions() {
@@ -116,6 +119,7 @@ public class QuestionService {
             questionStored.setRating(questionStored.getRating()-1);
         }
         questionRepository.save(questionStored);
+        userRepository.incrementRatings(auth.getName());
         return Map.of("message", "success");
     }
 
