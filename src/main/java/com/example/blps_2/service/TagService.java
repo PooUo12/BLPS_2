@@ -44,7 +44,7 @@ public class TagService {
     @Transactional
     public String deleteById(long id) {
         Tag tag = tagRepository.findById(id).orElse(new Tag());
-        if (tag.getQuestions() != null) {
+        if (!tag.getQuestions().isEmpty()) {
             return "This tag is in use. No delete can be provided.";
         }
         tagRepository.deleteById(id);

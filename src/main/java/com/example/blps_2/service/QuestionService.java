@@ -103,7 +103,7 @@ public class QuestionService {
     }
 
     @Transactional
-    public Map<String, String> updateQuestionRating(long id, boolean flag){
+    public Map<String, String> updateQuestionRating(long id, boolean flag) throws Exception {
         Authentication auth =  SecurityContextHolder.getContext().getAuthentication();
         if(auth.getName().equals(questionRepository.findById(id).orElse(new Question()).getUsername())){
             return Map.of("message", "failure - you cant vote on your own question");
@@ -119,6 +119,9 @@ public class QuestionService {
             questionStored.setRating(questionStored.getRating()-1);
         }
         questionRepository.save(questionStored);
+        if (!flag) {
+            throw new Error("ABOBA");
+        }
         userRepository.incrementRatings(auth.getName());
         return Map.of("message", "success");
     }

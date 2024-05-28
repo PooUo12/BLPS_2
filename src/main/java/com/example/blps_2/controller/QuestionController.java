@@ -49,7 +49,7 @@ public class QuestionController {
     }
 
     @PatchMapping("/question/{id}/{rate}")
-    public Map<String, String> rateById(@PathVariable("id") long id, @PathVariable("rate") boolean flag) {
+    public Map<String, String> rateById(@PathVariable("id") long id, @PathVariable("rate") boolean flag) throws Exception {
         logger.info("Voting on question: {}", id);
         return questionService.updateQuestionRating(id, flag);
     }

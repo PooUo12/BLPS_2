@@ -4,10 +4,10 @@ import com.example.blps_2.model.Role;
 import com.example.blps_2.model.User;
 import com.example.blps_2.repository.UserRepository;
 import com.example.blps_2.security.JWTProvider;
+import com.example.blps_2.userXML.UserXML;
 import com.example.blps_2.userXML.Users;
 import com.example.blps_2.userXML.XMLWorker;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -35,7 +35,10 @@ public class UserService implements UserDetailsService {
         if (users == null){
             return;
         }
-        for (com.example.blps_2.userXML.User user: users.getUserList()){
+        if (users.getUserList() == null){
+            return;
+        }
+        for (UserXML user: users.getUserList()){
             saveUser(new User(user.getId(), user.getUsername(), user.getPass(), Collections.singleton(new Role(1L, "ROLE_USER")), user.getRatings()));
         }
 
@@ -81,6 +84,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user);
 
         var token = jwtUtil.generateToken(user);
+        destroy();
         return Map.of("jwt-token", token);
     }
 
@@ -114,14 +118,15 @@ public class UserService implements UserDetailsService {
 
         return user;
     }
-    @PreDestroy
     public void destroy(){
-        List<com.example.blps_2.userXML.User> users = new ArrayList<>();
-        for(User user: allUsers()){
-            users.add(new com.example.blps_2.userXML.User(user.getId(), user.getUsername(), user.getPassword(), user.getRatings()));
-            XMLWorker xmlWorker = new XMLWorker();
-            xmlWorker.xmlWrite(new Users(users));
+        List<UserXML> users = new ArrayList<>();
+        List<User> userss = allUsers();
+        XMLWorker xmlWorker = new XMLWorker();
+        for(User user: userss){
+            users.add(new UserXML(user.getId(), user.getUsername(), user.getPassword(), user.getRatings()));
         }
+        xmlWorker.xmlWrite(new Users(users));
+
     }
 }
 

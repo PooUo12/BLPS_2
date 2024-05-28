@@ -13,7 +13,7 @@ import java.nio.channels.ScatteringByteChannel;
 import java.util.stream.Collectors;
 
 public class XMLWorker {
-    private final Logger logger = LoggerFactory.getLogger(QuestionController .class);
+    private final Logger logger = LoggerFactory.getLogger(XMLWorker.class);
     public Users xmlRead() {
         Users users = null;
         try {
@@ -27,6 +27,7 @@ public class XMLWorker {
             logger.info("Cannot find xml file to read");
         } catch (JAXBException e) {
             logger.info("Error while processing user xml");
+            e.printStackTrace();
         }
         return users;
     }
@@ -41,6 +42,7 @@ public class XMLWorker {
         } catch (FileNotFoundException e){
             logger.info("Cannot find xml file to write read file");
         } catch (JAXBException e) {
+            e.printStackTrace();
             logger.info("Error while processing user xml write file");
         } catch (IOException e) {
             logger.info("Cannot write to file");

@@ -35,7 +35,7 @@ public class User implements UserDetails {
     private Set<Role> roles;
 
     @Column(name = "ratings", nullable = false)
-    private int ratings;
+    private int ratings = 0;
 
     public User() {
     }
